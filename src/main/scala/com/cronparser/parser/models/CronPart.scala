@@ -9,7 +9,7 @@ import scala.util.Try
  *
  * A cron expression is used to specify a schedule in Unix-based systems.
  * Each cron expression consists of five or six parts, which define the schedule
- * in terms of minute, hour, day of month, month, day of week, and optionally year.
+ * in terms of minute, hour, day of month, month, day of week.
  */
 sealed trait CronPart {
   private val columnSize: Int = 14
