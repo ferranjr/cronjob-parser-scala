@@ -2,6 +2,8 @@ package com.cronparser.parser.models
 
 import java.time.{LocalDateTime, ZoneId}
 import java.time.format.{DateTimeFormatter, FormatStyle}
+import java.time.temporal.ChronoUnit
+import scala.util.Try
 
 /**
  * Represents a Cron Expression.
@@ -51,13 +53,18 @@ case class CronExpression(
 
     val year        = if(nMonth < seedMonth) seed.getYear + 1 else seed.getYear
 
-    LocalDateTime.of(
-      year,
-      nMonth,
-      nDayOfMonth,
-      nHour,
-      nMinute,
-      0
+    Try(
+      LocalDateTime.of(
+        year,
+        nMonth,
+        nDayOfMonth,
+        nHour,
+        nMinute,
+        0
+      )
+    ).fold(
+      _ => nextIteration(seed.plus(1, ChronoUnit.DAYS)),
+      identity
     )
   }
 
@@ -93,8 +100,7 @@ case class CronExpression(
 
   private val dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
 
-  private def next5IterationsAsFullString(): List[String] = {
+  private def next5IterationsAsFullString(): List[String] =
     nextIterations(5, seed = LocalDateTime.now())
       .map(_.atZone(ZoneId.systemDefault()).format(dateTimeFormatter))
-  }
 }

@@ -108,4 +108,23 @@ class CronExpressionVisualizerSpec
       LocalDateTime.parse("2025-05-15T12:10:00"), // THURSDAY
     )
   }
+
+  it should "respect end of month not being valid" in {
+    val cronExpression = CronExpression(
+      Minute.hasRangeLimit.exactAt(10).value,
+      Hour.hasRangeLimit.exactAt(12).value,
+      DayOfMonth.hasRangeLimit.exactAt(31).value,
+      Month.hasRangeLimit.every(1).value,
+      DayOfWeek.hasRangeLimit.every(1).value,
+      Command("foobar")
+    )
+    val result = cronExpression.nextIterations(n = 5, LocalDateTime.parse("2024-09-10T00:00:00"))
+    result shouldBe List(
+      LocalDateTime.parse("2024-10-31T12:10:00"),
+      LocalDateTime.parse("2024-12-31T12:10:00"),
+      LocalDateTime.parse("2025-01-31T12:10:00"),
+      LocalDateTime.parse("2025-03-31T12:10:00"),
+      LocalDateTime.parse("2025-05-31T12:10:00"),
+    )
+  }
 }
