@@ -33,6 +33,9 @@ sealed trait CronPart {
 
 case class Minute private (minutes: List[Int]) extends CronPart {
   require(minutes.forall(Minute.hasRangeLimit.isInRange))
+
+  def next(current: Int): Int =
+    minutes.dropWhile(current > _).headOption.getOrElse(minutes.head)
 }
 
 object Minute {
@@ -45,6 +48,9 @@ object Minute {
 
 case class Hour(hours: List[Int]) extends CronPart {
   require(hours.forall(Hour.hasRangeLimit.isInRange))
+
+  def next(current: Int): Int =
+    hours.dropWhile(current > _).headOption.getOrElse(hours.head)
 }
 
 object Hour {
@@ -57,6 +63,9 @@ object Hour {
 
 case class DayOfMonth(days: List[Int]) extends CronPart {
   require(days.forall(DayOfMonth.hasRangeLimit.isInRange))
+
+  def next(current: Int): Int =
+    days.dropWhile(current > _).headOption.getOrElse(days.head)
 }
 
 object DayOfMonth {
@@ -69,6 +78,9 @@ object DayOfMonth {
 
 case class Month(months: List[Int]) extends CronPart {
   require(months.forall(Month.hasRangeLimit.isInRange))
+
+  def next(current: Int): Int =
+    months.dropWhile(current > _).headOption.getOrElse(months.head)
 }
 
 object Month {
@@ -81,12 +93,15 @@ object Month {
 
 case class DayOfWeek(days: List[Int]) extends CronPart {
   require(days.forall(DayOfWeek.hasRangeLimit.isInRange))
+
+  def next(current: Int): Int =
+    days.dropWhile(current >= _).headOption.getOrElse(days.head)
 }
 
 object DayOfWeek {
   implicit val hasRangeLimit: HasRangeLimit[DayOfWeek] = new HasRangeLimit[DayOfWeek] {
-    override def min: Int = 0
-    override def max: Int = 6
+    override def min: Int = 0 // SUN
+    override def max: Int = 6 // SAT
     override def fromList(ls: List[Int]): Try[DayOfWeek] = Try(DayOfWeek.apply(ls))
   }
 }

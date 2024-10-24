@@ -1,6 +1,5 @@
 package com.cronparser
 
-import com.cronparser.lexer.Tokenizer
 import com.cronparser.parser.Parser
 
 object Main
