@@ -1,4 +1,7 @@
 .idea/
+.DS_Store
+*/.DS_Store
+*/**/.DS_Store
 
 ### SBT template
 # Simple Build Tool
@@ -13,4 +16,3 @@ project/plugins/project/
 .history
 .cache
 .lib/
-
