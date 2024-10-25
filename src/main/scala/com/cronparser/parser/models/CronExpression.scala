@@ -92,7 +92,7 @@ case class CronExpression(
       }
       .filter { candidate =>
         val value = convertDayOfTheWeekCron(candidate.getDayOfWeek)
-        this.dayOfTheWeek.days.contains(value)
+        this.dayOfTheWeek.instances.contains(value)
       }
       .take(n)
       .toList

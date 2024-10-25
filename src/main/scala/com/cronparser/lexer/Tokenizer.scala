@@ -10,13 +10,6 @@ import scala.annotation.tailrec
  */
 object Tokenizer {
 
-  /**
-   *
-   * @param chars
-   * @param currentToken
-   * @param acc
-   * @return
-   */
   @tailrec
   private def tokenizeRec(
     chars: List[Char],
@@ -49,14 +42,6 @@ object Tokenizer {
     }
   }
 
-  /**
-   *
-   * @param chars
-   * @param newToken
-   * @param currentToken
-   * @param acc
-   * @return
-   */
   private def commitToken(
     chars: List[Char],
     newToken: Token,

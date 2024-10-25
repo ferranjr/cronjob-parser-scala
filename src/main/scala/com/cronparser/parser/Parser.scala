@@ -19,7 +19,6 @@ object Parser {
    * @tparam A The Type (Unit) we are targeting on the parse function
    * @return Either a parsingError or a tuple containing the unit completed and the rest of tokens to process
    */
-  @tailrec
   private def parseList[A](
     tokens: List[Token],
     acc: List[Int],
@@ -30,6 +29,15 @@ object Parser {
         ev.atTimes((number :: acc).reverse).map { value => (value, tail) }
       case Token.Number(number) :: Token.Comma :: tail =>
         parseList[A](tail, number :: acc)
+      case Token.Text(word) :: Token.Whitespace :: tail =>
+        for {
+          number <- ev.wordValue(word)
+          value <- ev.atTimes((number :: acc).reverse)
+        } yield (value, tail)
+      case Token.Text(word) :: Token.Comma :: tail =>
+        ev.wordValue(word).flatMap { number =>
+          parseList[A](tail, number :: acc)
+        }
       case unexpected :: _ =>
         Left(ParsingError.UnexpectedToken(unexpected))
     }
@@ -49,14 +57,29 @@ object Parser {
       case Nil => Left(ParsingError.UnexpectedEndOfTokens)
       case Token.Number(number) :: Token.Whitespace :: tail =>
         ev.exactAt(number).map { value => (value, tail) }
+      case Token.Text(word) :: Token.Whitespace :: tail =>
+        for {
+          numericValue <- ev.wordValue(word)
+          value <- ev.exactAt(numericValue)
+        } yield (value, tail)
       case Token.Asterisk :: Token.Slash :: Token.Number(number) :: Token.Whitespace :: tail =>
         ev.every(number).map { value => (value, tail) }
       case Token.Asterisk :: Token.Whitespace :: tail =>
         ev.every(1).map { value => (value, tail) }
       case Token.Number(number) :: Token.Comma :: tail =>
         parseList[A](tail, List(number))
+      case Token.Text(word) :: Token.Comma :: tail =>
+        ev.wordValue(word).flatMap { number =>
+          parseList[A](tail, List(number))
+        }
       case Token.Number(number) :: Token.Hyphen :: Token.Number(number2) :: Token.Whitespace :: tail =>
         ev.range(number, number2).map { value => (value, tail) }
+      case Token.Text(word) :: Token.Hyphen :: Token.Text(word2) :: Token.Whitespace :: tail =>
+        for {
+          numericValue1 <- ev.wordValue(word)
+          numericValue2 <- ev.wordValue(word2)
+          value <- ev.range(numericValue1, numericValue2)
+        } yield (value, tail)
       case unexpected :: _ =>
         Left(ParsingError.UnexpectedToken(unexpected))
     }

@@ -6,6 +6,5 @@ lazy val root = (project in file("."))
   .settings(
     name := "CronParser",
     assembly / mainClass := Some("com.cronparser.Main"),
-    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
   )

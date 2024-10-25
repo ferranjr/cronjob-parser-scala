@@ -16,6 +16,13 @@ trait HasRangeLimit[A] {
 
   def fromList(ls: List[Int]): Try[A]
 
+  def labelsMap: Map[String, Int] = Map.empty
+
+  def wordValue(word: String): Either[ParsingError, Int] =
+    labelsMap.get(word).fold[Either[ParsingError, Int]](
+      Left(ParsingError.InvalidLabel(word))
+    )(Right.apply)
+
   def isInRange(n: Int): Boolean =
     n >= min && n <= max
 

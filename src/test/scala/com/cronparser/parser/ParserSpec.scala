@@ -88,7 +88,7 @@ class ParserSpec
     )
   }
 
-  it should "work for our sample example" in {
+  it should "work for our example" in {
     val input = "*/15 0 1,15 * 1-5 /usr/bin/find"
     val result = Parser.parse(input).value
     result shouldBe CronExpression(
@@ -97,6 +97,32 @@ class ParserSpec
       HasRangeLimit[DayOfMonth].atTimes(List(1, 15)).value,
       HasRangeLimit[Month].every(1).value,
       HasRangeLimit[DayOfWeek].atTimes(List(1, 2, 3, 4, 5)).value,
+      Command("/usr/bin/find")
+    )
+  }
+
+  it should "work for our example using DAY label names" in {
+    val input = "*/15 0 1,15 * MON-FRI /usr/bin/find"
+    val result = Parser.parse(input).value
+    result shouldBe CronExpression(
+      HasRangeLimit[Minute].atTimes(List(0, 15, 30, 45)).value,
+      HasRangeLimit[Hour].exactAt(0).value,
+      HasRangeLimit[DayOfMonth].atTimes(List(1, 15)).value,
+      HasRangeLimit[Month].every(1).value,
+      HasRangeLimit[DayOfWeek].atTimes(List(1, 2, 3, 4, 5)).value,
+      Command("/usr/bin/find")
+    )
+  }
+
+  it should "work for our example using MONTH label names" in {
+    val input = "*/15 0 1,15 JAN-DEC MON,WED,FRI /usr/bin/find"
+    val result = Parser.parse(input).value
+    result shouldBe CronExpression(
+      HasRangeLimit[Minute].atTimes(List(0, 15, 30, 45)).value,
+      HasRangeLimit[Hour].exactAt(0).value,
+      HasRangeLimit[DayOfMonth].atTimes(List(1, 15)).value,
+      HasRangeLimit[Month].every(1).value,
+      HasRangeLimit[DayOfWeek].atTimes(List(1, 3, 5)).value,
       Command("/usr/bin/find")
     )
   }
